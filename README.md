@@ -124,7 +124,7 @@ This repo includes:
 - `telemetry-logger.service` (systemd unit)
 - `install_service.sh` (installs + enables the unit)
 
-Install and start at boot:
+Install and start at boot (uses the invoking user/group; if you run with `sudo` it uses `$SUDO_USER`):
 
 ```bash
 ./install_service.sh
@@ -142,7 +142,7 @@ Service defaults (edit `telemetry-logger.service` to change):
 - Interval: 5 seconds
 - Top processes: 10
 - Power supply: `auto`
-- Runs as user/group: `clockworkpi` (change `User=` / `Group=` if needed)
+- Runs as user/group: the account that runs `./install_service.sh` (rendered into the unit at install time)
 
 After editing:
 
