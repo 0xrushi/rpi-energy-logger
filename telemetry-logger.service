@@ -1,0 +1,24 @@
+[Unit]
+Description=Raspberry Pi telemetry logger (SQLite)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=clockworkpi
+Group=clockworkpi
+WorkingDirectory=/home/clockworkpi/Documents
+
+# Creates /var/lib/telemetry-logger owned by the service user (systemd feature).
+StateDirectory=telemetry-logger
+
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 /home/clockworkpi/Documents/logger.py --db /var/lib/telemetry-logger/telemetry.db --interval 5 --top-procs 10 --power-supply auto
+
+Restart=always
+RestartSec=2
+
+Nice=10
+
+[Install]
+WantedBy=multi-user.target
