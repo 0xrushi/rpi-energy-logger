@@ -1,6 +1,6 @@
 # Raspberry Pi Telemetry Logger (SQLite)
 
-Logs battery (placeholder), CPU, and process-level resource usage into a SQLite database at a configurable interval (default: 5s). Designed to be reproducible on a fresh Raspberry Pi OS install without `pip`.
+Logs battery, CPU, and process-level resource usage into a SQLite database at a configurable interval (default: 5s). Designed to be reproducible on a fresh Raspberry Pi OS install without `pip`.
 
 ## System dependencies (apt)
 
