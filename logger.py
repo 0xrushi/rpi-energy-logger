@@ -224,14 +224,26 @@ def _sample_processes(
     candidates: list[tuple[float, int, str, float]] = []
     new_prev: dict[int, float] = {}
 
-    for proc in psutil.process_iter(["pid", "name"]):
+    for proc in psutil.process_iter(["pid", "name", "cmdline", "exe"]):
         try:
             pid = int(proc.info["pid"])
+            cmdline = proc.info.get("cmdline") or []
+            exe = proc.info.get("exe") or ""
             name = proc.info.get("name") or ""
             cpu_times = proc.cpu_times()
             mem_pct = float(proc.memory_percent())
         except (psutil.NoSuchProcess, psutil.AccessDenied, KeyError):
             continue
+
+        display = ""
+        if cmdline:
+            display = " ".join(cmdline)
+        elif exe:
+            display = exe
+        else:
+            display = name
+        if not display:
+            display = f"[pid {pid}]"
 
         total_cpu_s = float(cpu_times.user + cpu_times.system)
         new_prev[pid] = total_cpu_s
@@ -243,7 +255,7 @@ def _sample_processes(
             if cpu_pct < 0:
                 cpu_pct = 0.0
 
-        candidates.append((cpu_pct, pid, name, mem_pct))
+        candidates.append((cpu_pct, pid, display, mem_pct))
 
     candidates.sort(key=lambda x: x[0], reverse=True)
     rows = [(ts, pid, name, cpu, mem) for (cpu, pid, name, mem) in candidates[:top_n]]

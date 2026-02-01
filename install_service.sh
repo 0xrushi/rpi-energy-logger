@@ -6,6 +6,8 @@ SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 SERVICE_USER="${SUDO_USER:-$(id -un)}"
 SERVICE_GROUP="$(id -gn "${SERVICE_USER}")"
+WORKDIR="${SRC_DIR}"
+POWER_SUPPLY="${POWER_SUPPLY:-auto}"
 
 if [[ ! -f "${SRC_DIR}/${SERVICE_NAME}" ]]; then
   echo "error: ${SRC_DIR}/${SERVICE_NAME} not found" >&2
@@ -15,9 +17,14 @@ fi
 TMP_SERVICE=$(mktemp)
 trap 'rm -f "${TMP_SERVICE}"' EXIT
 
-sed -e "s/@USER@/${SERVICE_USER}/" -e "s/@GROUP@/${SERVICE_GROUP}/" "${SRC_DIR}/${SERVICE_NAME}" >"${TMP_SERVICE}"
+sed \
+  -e "s|@USER@|${SERVICE_USER}|" \
+  -e "s|@GROUP@|${SERVICE_GROUP}|" \
+  -e "s|@WORKDIR@|${WORKDIR}|" \
+  -e "s|@POWER_SUPPLY@|${POWER_SUPPLY}|" \
+  "${SRC_DIR}/${SERVICE_NAME}" >"${TMP_SERVICE}"
 
-echo "Installing systemd service to /etc/systemd/system/${SERVICE_NAME} (user=${SERVICE_USER} group=${SERVICE_GROUP})"
+echo "Installing systemd service to /etc/systemd/system/${SERVICE_NAME} (user=${SERVICE_USER} group=${SERVICE_GROUP} workdir=${WORKDIR} power_supply=${POWER_SUPPLY})"
 sudo install -m 0644 "${TMP_SERVICE}" "/etc/systemd/system/${SERVICE_NAME}"
 
 echo "Reloading systemd + enabling service"

@@ -35,6 +35,8 @@ Common options:
 python3 logger.py --db telemetry.db --interval 5 --top-procs 10 --verbose
 ```
 
+Process samples record the full command line when available (e.g., `/usr/bin/python3 /path/script.py`) falling back to the executable path or process name.
+
 ## ML-friendly view (`training_view`)
 
 On startup, the logger creates a SQLite view named `training_view` that gives one row per timestamp with common features + targets:
@@ -143,6 +145,13 @@ Service defaults (edit `telemetry-logger.service` to change):
 - Top processes: 10
 - Power supply: `auto`
 - Runs as user/group: the account that runs `./install_service.sh` (rendered into the unit at install time)
+- Working directory and script path are rendered to the repo directory that ran `./install_service.sh` (e.g., `/home/youruser/Documents/rpi-energy-logger/logger.py`), avoiding `%h` expansion issues on some systems.
+
+To target a specific battery device (e.g., `axp20x-battery`), set `POWER_SUPPLY` when installing:
+
+```bash
+POWER_SUPPLY=axp20x-battery ./install_service.sh
+```
 
 After editing:
 
